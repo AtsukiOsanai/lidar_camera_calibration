@@ -6,6 +6,7 @@ Install dependencies.
 
 ```
 sudo apt install ros-DISTRO-camera-calibration
+sudo apt install ros-DISTRO-ros-numpy
 ```
 
 Run the following to clone the `lidar_camera_calibration` package in `ros_workspace/src` directory.
