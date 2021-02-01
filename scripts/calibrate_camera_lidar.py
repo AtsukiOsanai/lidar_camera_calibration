@@ -375,8 +375,11 @@ def project_point_cloud(velodyne, img_msg, image_pub):
         return
 
     # Transform the point cloud
+    camera_frame = img_msg.header.frame_id
     try:
-        transform = TF_BUFFER.lookup_transform('world', 'velodyne', rospy.Time())
+        # NOTE: changed the target frame from world to img_msg frame
+        # transform = TF_BUFFER.lookup_transform('world', 'velodyne', rospy.Time())
+        transform = TF_BUFFER.lookup_transform(camera_frame, 'velodyne', rospy.Time())
         velodyne = do_transform_cloud(velodyne, transform)
     except tf2_ros.LookupException:
         pass
@@ -389,10 +392,11 @@ def project_point_cloud(velodyne, img_msg, image_pub):
     if OUSTER_LIDAR: points3D = points3D.reshape(-1, 9)[:, :4]
     
     # Filter points in front of camera
+    # TODO: filter range should be changed from launch file.
     inrange = np.where((points3D[:, 2] > 0) &
-                       (points3D[:, 2] < 6) &
-                       (np.abs(points3D[:, 0]) < 6) &
-                       (np.abs(points3D[:, 1]) < 6))
+                       (points3D[:, 2] < 20) &
+                       (np.abs(points3D[:, 0]) < 20) &
+                       (np.abs(points3D[:, 1]) < 20))
     max_intensity = np.max(points3D[:, -1])
     points3D = points3D[inrange[0]]
 
